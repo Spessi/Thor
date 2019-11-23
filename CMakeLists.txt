@@ -111,12 +111,17 @@ endif()
 if(NOT THOR_SHARED_LIBS)
 	set(SFML_STATIC_LIBRARIES TRUE)
 endif()
-find_package(SFML 2.5 COMPONENTS audio graphics window system REQUIRED)
+
+find_package(SFML 2.5 COMPONENTS audio graphics window system QUIET)
 
 if(NOT SFML_FOUND)
-	set(SFML_DIR "" CACHE PATH "SFML top-level directory")
-	message("\n-> SFML directory not found. Set SFML_DIR (not SFML_ROOT) to SFML's top-level path (containing \"include\" and \"lib\" directories).")
-	message("-> Make sure the SFML libraries >= 2.5 with the same configuration (Release/Debug, Static/Dynamic) exist.\n")
+	if(TARGET sfml-audio AND TARGET sfml-graphics AND TARGET sfml-window AND TARGET sfml-system)
+		message(WARNING "\n -> Pre-compiled SFML directory not found, but found build targets! SFML will be built from source.")
+	else()
+		set(SFML_DIR "" CACHE PATH "SFML top-level directory")
+		message(SEND_ERROR "\n-> SFML directory not found. Set SFML_DIR (not SFML_ROOT) to SFML's top-level path (containing \"include\" and \"lib\" directories).")
+		message(FATAL_ERROR "-> Make sure the SFML libraries >= 2.5 with the same configuration (Release/Debug, Static/Dynamic) exist.\n")
+	endif()
 endif()
 
 
